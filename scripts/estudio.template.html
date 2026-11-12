@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore os movimentos do personagem de Lauan Gabriell em um estúdio pixel art.">
+  <title>Estúdio de Lauan Gabriell</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, sans-serif;
+      color: #fff5ed;
+      background: #1c1721;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 880px; margin: 0 auto; padding: clamp(24px, 7vw, 72px) 18px; }
+    header { margin-bottom: 24px; }
+    h1 { font-size: clamp(2rem, 6vw, 3.4rem); letter-spacing: -.055em; line-height: 1.06; margin: 0 0 12px; }
+    p { color: #d6c3ce; line-height: 1.55; margin: 0; }
+    canvas { display: block; width: 100%; height: auto; background: #2c2333; image-rendering: pixelated; }
+    .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+    button, select {
+      min-height: 44px; border-radius: 5px; border: 1px solid #886479;
+      color: inherit; background: #322638; font: inherit; padding: 8px 13px;
+    }
+    button { cursor: pointer; }
+    button:hover, select:hover { background: #473244; }
+    button[disabled], select[disabled] { opacity: .6; cursor: wait; }
+    #play { min-width: 111px; background: #784353; border-color: #b58391; font-weight: 650; }
+    #play:hover { background: #8d5061; }
+    :focus-visible { outline: 2px solid #f1c4a9; outline-offset: 3px; }
+    label { margin-left: auto; color: #e7cfdc; }
+    footer { margin-top: 26px; }
+    a { color: #f1bdad; text-underline-offset: 3px; }
+    @media (max-width: 510px) {
+      label { margin-left: 0; flex-basis: 100%; }
+      select { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Estúdio de Lauan Gabriell</h1>
+    <p>Veja a sequência completa ou escolha uma ação do personagem.</p>
+  </header>
+
+  <canvas width="384" height="134" role="img" aria-label="Estúdio em pixel art ao anoitecer, com um personagem de suéter vinho."></canvas>
+
+  <div class="controls">
+    <button type="button" id="play" disabled>Reproduzir</button>
+    <button type="button" id="restart" disabled>Recomeçar</button>
+    <label for="action">Ação</label>
+    <select id="action" disabled>
+      <option value="all">Sequência completa</option>
+      <option value="walk">Caminhar</option>
+      <option value="look">Observar e pensar</option>
+      <option value="phone">Conferir o celular</option>
+      <option value="code">Programar e comemorar</option>
+      <option value="wave">Acenar e descansar</option>
+    </select>
+  </div>
+
+  <footer><a href="https://github.com/lauangabriell">Ver perfil no GitHub</a></footer>
+  <noscript><p>Ative JavaScript para controlar a animação.</p></noscript>
+</main>
+<script id="art-data" type="application/json"><!--ART_DATA--></script>
+<script>
+  const art = JSON.parse(document.getElementById('art-data').textContent);
+  const canvas = document.querySelector('canvas');
+  const context = canvas.getContext('2d', {alpha: false});
+  const play = document.getElementById('play');
+  const restart = document.getElementById('restart');
+  const action = document.getElementById('action');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let sprites, backdrop, desk;
+  let running = false;
+  let first = 0;
+  let limit = art.frames.length;
+  let frame = 0;
+  let started = 0;
+  let request = 0;
+
+  function loadImage(src) {
+    const image = new Image();
+    image.src = src;
+    return image.decode().then(() => image);
+  }
+
+  function draw() {
+    const [pose, x] = art.frames[frame];
+    const {width, height, anchor, poses} = art.atlas;
+    const originY = art.floor - anchor[1];
+    const tile = poses[pose];
+    context.imageSmoothingEnabled = false;
+    context.drawImage(backdrop, 0, 0);
+    if (!art.deskPoses.includes(pose)) {
+      context.drawImage(desk, art.deskX - anchor[0], originY);
+    }
+    context.fillStyle = '#442f3c';
+    context.fillRect(x - 10, art.floor + 1, 21, 1);
+    context.drawImage(sprites, tile.x, tile.y, width, height, x - anchor[0], originY, width, height);
+  }
+
+  function tick(now) {
+    if (!started) started = now;
+    const delay = art.frames[frame][2];
+    if (now - started >= delay) {
+      frame = frame + 1 < limit ? frame + 1 : first;
+      started = now;
+      draw();
+    }
+    request = requestAnimationFrame(tick);
+  }
+
+  function setRunning(value) {
+    running = value;
+    cancelAnimationFrame(request);
+    play.textContent = running ? 'Pausar' : 'Reproduzir';
+    started = 0;
+    if (running) request = requestAnimationFrame(tick);
+  }
+
+  function reset() {
+    [first, limit] = art.actions[action.value];
+    frame = first;
+    started = 0;
+    draw();
+  }
+
+  Promise.all([loadImage(art.spritePng), loadImage(art.roomPng), loadImage(art.deskPng)])
+    .then(([spriteImage, backdropImage, deskImage]) => {
+      sprites = spriteImage;
+      backdrop = backdropImage;
+      desk = deskImage;
+      [play, restart, action].forEach(control => { control.disabled = false; });
+      play.addEventListener('click', () => setRunning(!running));
+      restart.addEventListener('click', reset);
+      action.addEventListener('change', reset);
+      motion.addEventListener('change', event => { if (event.matches) setRunning(false); });
+      reset();
+      setRunning(!motion.matches);
+    })
+    .catch(() => { document.querySelector('header p').textContent = 'A imagem do estúdio não pôde ser carregada.'; });
+</script>
+</body>
+</html>

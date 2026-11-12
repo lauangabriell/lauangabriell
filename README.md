@@ -83,4 +83,6 @@ Na TEIA, comecei a ligar interfaces web a modelos por API. A DIKE ampliou esse t
 
 [LinkedIn](https://www.linkedin.com/in/lauan-gabriell-91741b38a/) · [GitHub](https://github.com/lauangabriell)
 
+Para escolher a ação do personagem, baixe o [estúdio em HTML](./docs/estudio.html) e abra no navegador.
+
 <img src="./assets/pixel-character/sprites/wave.png" width="62" alt="Lauan em pixel art acena na despedida.">

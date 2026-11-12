@@ -30,7 +30,7 @@ A referência do DenverCoder1 mostrou como o README pode concentrar conteúdo pr
 | Compatibilidade | O GitHub conservou os elementos `picture`, `source` e `img`, resolveu os caminhos para `main` e aplicou largura máxima de 100% às imagens. A captura real é de desktop em tema claro. O tema escuro e um viewport de celular no GitHub seguem pendentes de verificação no navegador. |
 | Acessibilidade | Cabeçalhos e links são texto nativo. A cena e o aceno têm descrições. Os SVGs decorativos têm alternativa vazia. O README oferece link para a imagem estática e uma fonte com a preferência de movimento reduzido. |
 | Links | Repositórios públicos, documentação do VETOR, site da DIKE e MVP da TEIA foram verificados. O LinkedIn recusou a consulta automatizada. Foi usado o endereço fornecido pelo autor. |
-| Estúdio interativo | O teste da lógica JavaScript confirmou a seleção dos cinco trechos, reprodução, pausa, reinício e início pausado com movimento reduzido. O HTML incorpora as imagens e pode ser aberto a partir de um arquivo local. |
+| Estúdio interativo | No navegador, conferi programação, aceno, reprodução, pausa e reinício. O teste da lógica JavaScript cobriu os cinco trechos e o início pausado com movimento reduzido. O estúdio hospedado usa acesso privado. O HTML com as imagens incorporadas pode ser baixado pelo README e aberto localmente. |
 
 O GitHub documenta a sanitização do HTML e os controles de reprodução de GIF. A cena usa GIF para a animação e PNG para a alternativa estática. O HTML separado usa Canvas e JavaScript para oferecer os controles. [GitHub Markup](https://github.com/github/markup) · [Acessibilidade no GitHub](https://docs.github.com/pt/account-and-profile/how-tos/account-settings/managing-accessibility-settings)
 
